@@ -1,18 +1,34 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:rive_animation/theme.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+  const SignIn({super.key, required this.closeModal});
+  final Function? closeModal;
 
   @override
   State<SignIn> createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
+  final _emailController = TextEditingController();
+  final _passWordController = TextEditingController();
+
+  final bool _isLoading = false;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _emailController.dispose();
+    _passWordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -81,6 +97,7 @@ class _SignInState extends State<SignIn> {
                           ),
                           TextField(
                             decoration: authInputStyle(Icons.email),
+                            controller: _emailController,
                           ),
                           const SizedBox(
                             height: 16,
@@ -101,6 +118,7 @@ class _SignInState extends State<SignIn> {
                           TextField(
                             obscureText: true,
                             decoration: authInputStyle(Icons.lock),
+                            controller: _passWordController,
                           ),
                           const SizedBox(
                             height: 24,
@@ -225,37 +243,54 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Align(
+                  Positioned.fill(
+                      child: IgnorePointer(
+                    ignoring: true,
+                    child: Stack(
                       alignment: Alignment.center,
-                      child: CupertinoButton(
-                         color: Colors.red,
-                         padding: EdgeInsets.zero,
-                         borderRadius: BorderRadius.circular(36 /  2),
-                         minSize: 36,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(36 / 2),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: RiveAppTheme.shadow.withOpacity(0.3),
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3))
-                              ]),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.black,
-                          ),
-                        ),
-                        onPressed: () {}),
-                    )
-                  )
+                      children: [
+                        if (_isLoading)
+                          const SizedBox(
+                            width: 100,
+                            height: 100,
+                            child: RiveAnimation.asset("assets/rive/check.riv"),
+                          )
+                      ],
+                    ),
+                  )),
+                  Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: CupertinoButton(
+                            color: Colors.red,
+                            padding: EdgeInsets.zero,
+                            borderRadius: BorderRadius.circular(36 / 2),
+                            minSize: 36,
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(36 / 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: RiveAppTheme.shadow
+                                            .withOpacity(0.3),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3))
+                                  ]),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                              ),
+                            ),
+                            onPressed: () {
+                              widget.closeModal!();
+                            }),
+                      ))
                 ],
               )),
         ),
